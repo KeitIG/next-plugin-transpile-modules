@@ -62,7 +62,7 @@ module.exports = (nextConfig = {}) => {
       // Replace /node_modules/ by the new exclude RegExp (including the modules
       // that are going to be transpiled)
       const ignored = config.watchOptions.ignored.filter(
-        regexp => !regexEqual(regexp, /[\\\/]node_modules[\\\/]/)
+        regexp => !regexEqual(regexp, /[\\/]node_modules[\\/]/)
       ).concat(excludes);
 
       config.watchOptions.ignored = ignored;
