@@ -42,9 +42,6 @@ const withTm = (nextConfig = {}) => {
         );
       }
 
-      // Avoid Webpack to resolve transpiled modules path to their real path
-      config.resolve.symlinks = false;
-
       // Since Next.js 8.1.0, config.externals is undefined
       if (config.externals) {
         config.externals = config.externals.map(external => {
