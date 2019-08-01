@@ -63,7 +63,7 @@ const withTm = (nextConfig = {}) => {
 
       // Add a rule to include and parse all modules
       config.module.rules.push({
-        test: /\.+(js|jsx|ts|tsx)$/,
+        test: /\.+(mjs|js|jsx|ts|tsx)$/,
         loader: options.defaultLoaders.babel,
         include: includes
       });
