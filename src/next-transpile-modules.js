@@ -87,30 +87,33 @@ const withTmInitializer = (transpileModules = []) => {
         // TODO ask Next.js maintainer to expose the css-loader via defaultLoaders
         const nextCssLoaders = config.module.rules.find((rule) => typeof rule.oneOf === 'object');
 
-        // .module.css
+        // .module.css and .module.css
         if (nextCssLoaders) {
           const nextCssLoader = nextCssLoaders.oneOf.find(
             (rule) => rule.sideEffects === false && regexEqual(rule.test, /\.module\.css$/)
           );
-
           if (nextCssLoader) {
             nextCssLoader.issuer.include = nextCssLoader.issuer.include.concat(includes);
             nextCssLoader.issuer.exclude = excludes;
           }
 
+          const nextSassLoader = nextCssLoaders.oneOf.find(
+            (rule) => rule.sideEffects === false && regexEqual(rule.test, /\.module\.(scss|sass)$/)
+          );
+
+          if (nextSassLoader) {
+            nextSassLoader.issuer.include = nextSassLoader.issuer.include.concat(includes);
+            nextSassLoader.issuer.exclude = excludes;
+          }
+
           // Hack our way to disable errors on node_modules CSS modules
           const nextErrorCssLoader = nextCssLoaders.oneOf.find(
-            (rule) => rule.use && rule.use.loader === 'error-loader' && regexEqual(rule.test, /\.module\.css$/)
+            (rule) => rule.use && rule.use.loader === 'error-loader' && (Array.isArray(rule.test) ? regexEqual(rule.test[0], /\.module\.css$/) : regexEqual(rule.test, /\.module\.css$/))
           );
 
           if (nextErrorCssLoader) {
             nextErrorCssLoader.exclude = includes;
           }
-        }
-
-        // Overload the Webpack config if it was already overloaded
-        if (typeof nextConfig.webpack === 'function') {
-          return nextConfig.webpack(config, options);
         }
 
         return config;
