@@ -87,7 +87,7 @@ const withTmInitializer = (transpileModules = []) => {
         // TODO ask Next.js maintainer to expose the css-loader via defaultLoaders
         const nextCssLoaders = config.module.rules.find((rule) => typeof rule.oneOf === 'object');
 
-        // .module.css and .module.css
+        // .module.css and .module.sass/.module.scss
         if (nextCssLoaders) {
           const nextCssLoader = nextCssLoaders.oneOf.find(
             (rule) => rule.sideEffects === false && regexEqual(rule.test, /\.module\.css$/)
@@ -114,6 +114,12 @@ const withTmInitializer = (transpileModules = []) => {
           if (nextErrorCssLoader) {
             nextErrorCssLoader.exclude = includes;
           }
+
+          // Overload the Webpack config if it was already overloaded
+          if (typeof nextConfig.webpack === 'function') {
+            return nextConfig.webpack(config, options);
+          }
+
         }
 
         return config;
