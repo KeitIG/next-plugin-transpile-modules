@@ -106,9 +106,18 @@ const withTmInitializer = (modules = [], options = {}) => {
   const withTM = (nextConfig = {}) => {
     if (modules.length === 0) return nextConfig;
 
+    const matchCondition = (path) => {
+      modulesPaths.some((modulePath) => {
+        const transpiled = path.includes(modulePath);
+        if (transpiled) logger(`transpiled: ${path}`);
+        return transpiled;
+      })
+    };
+
     const resolveSymlinks = options.resolveSymlinks || false;
     const isWebpack5 = options.unstable_webpack5 || false;
     const debug = options.debug || false;
+    const match = options.match || matchCondition
 
     const logger = createLogger(debug);
 
@@ -120,12 +129,6 @@ const withTmInitializer = (modules = [], options = {}) => {
 
     // Generate Webpack condition for the passed modules
     // https://webpack.js.org/configuration/module/#ruleinclude
-    const match = (path) =>
-      modulesPaths.some((modulePath) => {
-        const transpiled = path.includes(modulePath);
-        if (transpiled) logger(`transpiled: ${path}`);
-        return transpiled;
-      });
 
     return Object.assign({}, nextConfig, {
       webpack(config, options) {
