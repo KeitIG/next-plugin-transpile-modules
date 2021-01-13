@@ -106,7 +106,6 @@ const withTmInitializer = (modules = [], options = {}) => {
   const withTM = (nextConfig = {}) => {
     if (modules.length === 0) return nextConfig;
 
-
     const resolveSymlinks = options.resolveSymlinks || false;
     const isWebpack5 = options.unstable_webpack5 || false;
     const debug = options.debug || false;
@@ -115,6 +114,8 @@ const withTmInitializer = (modules = [], options = {}) => {
 
     const modulesPaths = generateModulesPaths(modules);
 
+    // Generate Webpack condition for the passed modules
+    // https://webpack.js.org/configuration/module/#ruleinclude
     const matchCondition = (path) => {
       modulesPaths.some((modulePath) => {
         const transpiled = path.includes(modulePath);
@@ -128,8 +129,6 @@ const withTmInitializer = (modules = [], options = {}) => {
 
     logger(`the following paths will get transpiled:\n${modulesPaths.map((mod) => `  - ${mod}`).join('\n')}`);
 
-    // Generate Webpack condition for the passed modules
-    // https://webpack.js.org/configuration/module/#ruleinclude
 
     return Object.assign({}, nextConfig, {
       webpack(config, options) {
