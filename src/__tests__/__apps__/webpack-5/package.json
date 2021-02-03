@@ -5,8 +5,5 @@
     "_shared-ts",
     "_shared-ui",
     "app"
-  ],
-  "resolutions": {
-    "webpack": "^5.6.0"
-  }
+  ]
 }

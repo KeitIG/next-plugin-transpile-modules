@@ -4,7 +4,6 @@
 ![Dependencies](https://img.shields.io/david/martpie/next-transpile-modules)
 [![sponsor: Creative Tim](https://img.shields.io/badge/sponsor-Creative%20Tim-blue)](https://creative-tim.com/?affiliate_id=140482)
 
-
 Transpile modules from `node_modules` using the Next.js Babel configuration.
 
 Makes it easy to have local libraries and keep a slick, manageable dev experience.
@@ -33,7 +32,7 @@ What this plugin **does not aim** to solve:
 | Next.js 8 / 9     | 2.x            |
 | Next.js 6 / 7     | 1.x            |
 
-Latest version tested: **10.0.0**.
+Latest Next.js version tested: **10.0.6**.
 
 ## Installation
 
@@ -55,11 +54,12 @@ yarn add next-transpile-modules
 - `options` Object (optional)
   - `resolveSymlinks` Boolean: Enable symlinks resolution to their real path by Webpack (most of the time, you won't want that) (default to `false`)
   - `debug` Boolean: Display some informative logs in the console (can get noisy!) (default to `false`)
-  - `unstable_webpack5` Boolean: Enable [Next.js Webpack 5 support](https://nextjs.org/blog/next-9-5#webpack-5-support-beta) (experimental) (default to `false`)
 
-**note:** unstable features may break in any patch or minor release without any warning, be careful!
+#### Note on Webpack 5 support
 
-Example:
+Since `6.2.0` (with `next@10.0.6`), Webpack 5 support is automatically enabled via the `future.webpack5` flag, but is experimental and may break in any patch or minor release (from both `next` or `next-transpile-modules`) without any warning, be careful!
+
+#### Examples
 
 ```js
 // next.config.js
@@ -92,7 +92,7 @@ const withTM = require('next-transpile-modules')(['@shared/ui', '@shared/utils']
 ```
 
 ```js
-const withTM = require('next-transpile-modules')(['styleguide/components']);
+const withTM = require('next-transpile-modules')(['styleguide/node_modules/lodash-es']);
 
 // ...
 ```

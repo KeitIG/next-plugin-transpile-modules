@@ -1,3 +1,11 @@
+/**
+ * disclaimer:
+ *
+ * THIS PLUGIN IS A F*CKING BIG HACK.
+ *
+ * don't even try to reason about the quality of the following lines of code.
+ */
+
 const path = require('path');
 const process = require('process');
 
@@ -104,10 +112,14 @@ const createLogger = (enable) => {
  */
 const createWebpackMatcher = (modulesToTranspile, logger = createLogger(false)) => {
   return (pathValue) => {
-    const lastEntry = pathValue.split(`${pathValue.sep}node_modules${pathValue.sep}`).slice(-1)[0];
+    const isNestedNodeModules = (pathValue.match(/node_modules/g) || []).length > 1;
 
-    return modulesToTranspile.some((modulePath) => {
-      const transpiled = lastEntry.includes(path.normalize(modulePath));
+    if (isNestedNodeModules) {
+      return false;
+    }
+
+    return modulesPaths.some((modulePath) => {
+      const transpiled = pathValue.includes(modulePath);
       if (transpiled) logger(`transpiled: ${pathValue}`);
       return transpiled;
     });
@@ -124,7 +136,7 @@ const withTmInitializer = (modules = [], options = {}) => {
     if (modules.length === 0) return nextConfig;
 
     const resolveSymlinks = options.resolveSymlinks || false;
-    const isWebpack5 = options.unstable_webpack5 || false;
+    const isWebpack5 = (nextConfig.future && nextConfig.future.webpack5) || false;
     const debug = options.debug || false;
 
     const logger = createLogger(debug);
@@ -182,8 +194,9 @@ const withTmInitializer = (modules = [], options = {}) => {
             if (typeof external !== 'function') return external;
 
             if (isWebpack5) {
-              return ({ context, request }, cb) => {
-                return hasInclude(context, request) ? cb() : external({ context, request }, cb);
+              return async ({ context, request, getResolve }) => {
+                if (hasInclude(context, request)) return;
+                return external({ context, request, getResolve });
               };
             }
 
