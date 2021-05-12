@@ -3,6 +3,7 @@
   "workspaces": [
     "_shared",
     "_shared-ts",
+    "_shared-ts-source",
     "_shared-ui",
     "app"
   ]

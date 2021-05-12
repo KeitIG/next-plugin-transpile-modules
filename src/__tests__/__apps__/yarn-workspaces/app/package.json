@@ -18,6 +18,7 @@
     "sass": "^1.27.0",
     "shared": "^1.0.0",
     "shared-ts": "^1.0.0",
+    "shared-ts-source": "^1.0.0",
     "shared-ui": "^1.0.0"
   },
   "devDependencies": {
