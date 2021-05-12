@@ -1,7 +1,8 @@
 {
   "name": "shared-ts-source",
   "version": "1.0.0",
-  "main": "src/index.ts",
+  "source": "main/index.ts",
+  "main": "dist/index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
