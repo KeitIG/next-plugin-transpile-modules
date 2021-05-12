@@ -85,6 +85,7 @@ const createWebpackMatcher = (modulesToTranspile, logger = createLogger(false)) 
  */
 const withTmInitializer = (modules = [], options = {}) => {
   const withTM = (nextConfig = {}) => {
+
     if (modules.length === 0) return nextConfig;
 
     const resolveSymlinks = 'resolveSymlinks' in options ? options.resolveSymlinks : true;
@@ -97,12 +98,22 @@ const withTmInitializer = (modules = [], options = {}) => {
      * Our own Node.js resolver that can ignore symlinks resolution and  can support
      * PnP
      */
+    const resolveSource = enhancedResolve.create.sync({
+      symlinks: resolveSymlinks,
+      extensions: ['.js', '.jsx', '.ts', '.tsx', '.mjs', '.css', '.scss', '.sass'],
+      mainFields: ['ntm:source', 'source', 'main'],
+      // Is it right? https://github.com/webpack/enhanced-resolve/issues/283#issuecomment-775162497
+      conditionNames: ['require'],
+      resolveToContext: false
+    })
+
     const resolve = enhancedResolve.create.sync({
       symlinks: resolveSymlinks,
       extensions: ['.js', '.jsx', '.ts', '.tsx', '.mjs', '.css', '.scss', '.sass'],
-      mainFields: ['main', 'module', 'source'],
+      mainFields: ['ntm:source', 'main', 'module', 'source'],
       // Is it right? https://github.com/webpack/enhanced-resolve/issues/283#issuecomment-775162497
       conditionNames: ['require'],
+      resolveToContext: false,
     });
 
     /**
@@ -116,7 +127,16 @@ const withTmInitializer = (modules = [], options = {}) => {
 
       try {
         // Get the module path
-        packageDirectory = resolve(CWD, module);
+        console.log('CWD', CWD);
+        try {
+          packageDirectory = resolveSource(CWD, module);
+        } catch (e) {
+          packageDirectory = resolve(CWD, module);
+        }
+        console.log('PACKAGEDIR', packageDirectory);
+        if (module === "shared-ts-source") {
+          //throw new Error(`cool2 - ${module}`);
+        }
 
         if (!packageDirectory) {
           throw new Error(
@@ -125,29 +145,35 @@ const withTmInitializer = (modules = [], options = {}) => {
         }
 
         // Get the location of its package.json
-        const pkgPath = escalade(packageDirectory, (dir, names) => {
+        /** REMOVED TO TEST
+         const pkgPath = escalade(packageDirectory, (dir, names) => {
           if (names.includes('package.json')) {
             return 'package.json';
           }
           return false;
         });
-        if (pkgPath == null) {
+         if (pkgPath == null) {
           throw new Error(
             `next-transpile-modules - an error happened when trying to get the root directory of "${module}". Is it missing a package.json?\n${err}`
           );
         }
-        packageRootDirectory = path.dirname(pkgPath);
+         packageRootDirectory = path.dirname(pkgPath);
+         --- END OF REMOVED TO TEST */
+        packageRootDirectory = path.dirname(packageDirectory);
+        console.log('PK', packageRootDirectory)
+
       } catch (err) {
         throw new Error(
           `next-transpile-modules - an unexpected error happened when trying to resolve "${module}". Are you sure the name module you are trying to transpile is correct, and it has a "main" or an "exports" field?\n${err}`
         );
       }
-
       return packageRootDirectory;
     };
 
     // Resolve modules to their real paths
     const modulesPaths = modules.map(getPackageRootDirectory);
+
+    console.log('MODULES_PATHS', modulesPaths);
 
     logger(`the following paths will get transpiled:\n${modulesPaths.map((mod) => `  - ${mod}`).join('\n')}`);
 
